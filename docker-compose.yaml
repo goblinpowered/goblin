@@ -1,0 +1,101 @@
+version: '3.8'
+services:
+  database:
+    build:
+      context: ./database
+    restart: always
+    ports:
+      - 5432:5432
+  redis:
+    image: redis:6-alpine
+    ports:
+      - 6379:6379
+  auth:
+    build:
+      context: ./auth
+      target: development
+    volumes:
+      - ./auth:/usr/src/app
+    ports:
+      - '9001'
+    command: npm start
+    env_file:
+      - env/dev.env
+  api:
+    build:
+      context: ./api
+      target: development
+    volumes:
+      - ./api:/usr/src/app
+    ports:
+      - '9001'
+    command: npm start
+    env_file:
+      - env/dev.env
+  envoy:
+    build:
+      context: ./envoy
+    ports:
+      - 8080:8080
+    links:
+      - auth
+      - api
+  # continuous test run for authservice
+  auth-test:
+    build:
+      context: ./auth
+      target: development
+    volumes:
+      - ./auth:/usr/src/app
+    ports:
+      - 9229:9229
+    # command: npm run test:watch
+    command: node --inspect-brk=0.0.0.0 -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand --watchAll
+    env_file:
+      - env/dev.env
+  # continuous test run for the api
+  api-test:
+    build:
+      context: ./api
+      target: development
+    volumes:
+      - ./api:/usr/src/app
+    ports:
+      - '9001'
+    command: npm run test:watch
+    env_file:
+      - env/dev.env
+  # firebase emulators
+  firebase-dev:
+    build:
+      context: ./firebase
+      target: emulators
+    command: firebase --project framesystem-v2 emulators:start
+    env_file:
+      - env/dev.env
+    ports:
+      - 4000:4000
+      - 9099:9099
+  # scripts:
+  #   build:
+  #     context: ./scripts
+  #   profiles:
+  #     - dev
+  #   env_file:
+  #     - env/dev.env
+
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #   volumes:
+  #     - ./frontend:/app
+  #     - /app/node_modules
+  #   ports:
+  #     - 4200:4200
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     - CHOKIDAR_USEPOLLING=true
+  #   links:
+  #     - envoy
+  #     - firebase

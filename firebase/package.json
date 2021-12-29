@@ -1,0 +1,16 @@
+{
+  "name": "firebase",
+  "version": "1.0.0",
+  "description": "Firebase tools for framesystem development",
+  "main": "index.js",
+  "scripts": {
+    "seed": "ts-node src/seed.ts",
+    "token": "ts-node src/token.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "firebase-admin": "^9.6.0",
+    "ts-node": "^9.1.1"
+  }
+}

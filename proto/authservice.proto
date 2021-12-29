@@ -1,0 +1,18 @@
+syntax = "proto3";
+package framesystem.auth;
+
+service FramesystemAuthService {
+  rpc Authorize(AuthorizeRequest) returns (AuthorizeResponse) {}
+}
+
+message AuthorizeRequest {
+  string resource = 1;
+  string profile = 2;
+  string role = 3;
+  string user = 4;
+  string token = 5;
+}
+
+message AuthorizeResponse {
+  bool authorized = 1;
+}

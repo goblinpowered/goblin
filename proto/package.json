@@ -1,0 +1,15 @@
+{
+  "name": "proto",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "protoc --plugin=node_modules/ts-proto/protoc-gen-ts_proto --ts_proto_opt=env=node --ts_proto_opt=unrecognizedEnum=false --ts_proto_opt=outputClientImpl=false --ts_proto_opt=useDate=false --ts_proto_out=./ -I ./ *.proto",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "ts-proto": "^1.92.1"
+  }
+}

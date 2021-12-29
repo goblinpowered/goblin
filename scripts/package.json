@@ -1,0 +1,16 @@
+{
+  "name": "scripts",
+  "version": "1.0.0",
+  "description": "scripts for framesystem",
+  "main": "index.js",
+  "scripts": {
+    "seed": "ts-node src/seed.ts",
+    "token": "ts-node src/token.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "firebase-admin": "^10.0.1",
+    "ts-node": "^10.4.0"
+  }
+}
