@@ -18,6 +18,7 @@ import {
   authenticate,
   grant,
 } from '../testing/postgres';
+import { AuthModule } from './auth.module';
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_PUBLIC_API_KEY,
@@ -42,15 +43,7 @@ describe('AuthorizeController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [AuthorizeController],
-      providers: [
-        FirebaseService,
-        PostgresService,
-        {
-          provide: 'POSTGRES',
-          useClass: Pool,
-        },
-      ],
+      imports: [AuthModule],
     }).compile();
 
     controller = module.get<AuthorizeController>(AuthorizeController);
@@ -61,40 +54,38 @@ describe('AuthorizeController', () => {
     await pool?.end();
   });
 
-  describe('authentication step', () => {
-    test('it authenticates tokens', async () => {
-      const resource = await createGroup('resource', pool);
-      const actor = await createProfile('actor', pool);
-      const user = await createUser('user', pool);
-      const userInfo = await admin.auth().createUser({
-        displayName: 'user',
-        emailVerified: true,
-        password: 'password',
-        email: `${user}@example.com`,
-      });
-
-      const credential = await signInWithEmailAndPassword(
-        auth,
-        `${user}@example.com`,
-        'password',
-      );
-
-      const decodedToken = await credential.user.getIdTokenResult();
-      const token: string = decodedToken.token;
-
-      await authenticate({ user, token: userInfo.uid }, pool);
-      await grant({ resource, actor, role: 'potato' }, pool);
-      await grant({ resource: actor, actor: user, role: 'actor' }, pool);
-      const result = await controller.authorize(
-        AuthorizeRequest.fromPartial({
-          token,
-          resource,
-          profile: actor,
-          user,
-          role: 'potato',
-        }),
-      );
-      expect(result.authorized).toEqual(true);
+  test('it authenticates tokens', async () => {
+    const resource = await createGroup('resource', pool);
+    const actor = await createProfile('actor', pool);
+    const user = await createUser('user', pool);
+    const userInfo = await admin.auth().createUser({
+      displayName: 'user',
+      emailVerified: true,
+      password: 'password',
+      email: `${user}@example.com`,
     });
+
+    const credential = await signInWithEmailAndPassword(
+      auth,
+      `${user}@example.com`,
+      'password',
+    );
+
+    const decodedToken = await credential.user.getIdTokenResult();
+    const token: string = decodedToken.token;
+
+    await authenticate({ user, token: userInfo.uid }, pool);
+    await grant({ resource, actor, role: 'potato' }, pool);
+    await grant({ resource: actor, actor: user, role: 'actor' }, pool);
+    const result = await controller.authorize(
+      AuthorizeRequest.fromPartial({
+        token,
+        resource,
+        profile: actor,
+        user,
+        role: 'potato',
+      }),
+    );
+    expect(result.authorized).toEqual(true);
   });
 });

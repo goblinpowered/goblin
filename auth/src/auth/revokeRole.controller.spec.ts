@@ -1,6 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { RevokeRoleRequest } from '../proto/authservice';
-import { PostgresService } from '../services/postgres/postgres.service';
 import { RevokeRoleController } from './revokeRole.controller';
 import { Pool } from 'pg';
 import {
@@ -10,6 +8,7 @@ import {
   authenticate,
   grant,
 } from '../testing/postgres';
+import { AuthModule } from './auth.module';
 
 describe('RevokeRoleController', () => {
   let controller: RevokeRoleController;
@@ -17,14 +16,7 @@ describe('RevokeRoleController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [RevokeRoleController],
-      providers: [
-        PostgresService,
-        {
-          provide: 'POSTGRES',
-          useClass: Pool,
-        },
-      ],
+      imports: [AuthModule],
     }).compile();
 
     controller = module.get<RevokeRoleController>(RevokeRoleController);

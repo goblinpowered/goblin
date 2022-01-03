@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GrantRoleRequest } from '../proto/authservice';
-import { PostgresService } from '../services/postgres/postgres.service';
 import { GrantRoleController } from './grantRole.controller';
 import { Pool } from 'pg';
 import {
@@ -10,6 +9,7 @@ import {
   authenticate,
   grant,
 } from '../testing/postgres';
+import { AuthModule } from './auth.module';
 
 describe('GrantRoleController', () => {
   let controller: GrantRoleController;
@@ -17,14 +17,7 @@ describe('GrantRoleController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [GrantRoleController],
-      providers: [
-        PostgresService,
-        {
-          provide: 'POSTGRES',
-          useClass: Pool,
-        },
-      ],
+      imports: [AuthModule],
     }).compile();
 
     controller = module.get<GrantRoleController>(GrantRoleController);

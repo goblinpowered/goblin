@@ -13,14 +13,6 @@ export interface ResourceType {
 export class PostgresService {
   constructor(@Inject('POSTGRES') private pool: Pool) {}
 
-  async authorizeUser({ user, profile }: AuthorizeRequest) {
-    const result = await this.pool.query(
-      'SELECT * from auth_contexts where user_id = $1 and profile_id = $2 limit 1',
-      [user, profile],
-    );
-    return result.rowCount >= 1;
-  }
-
   async grantRole({
     resource,
     actor,
@@ -36,9 +28,16 @@ export class PostgresService {
     );
   }
 
-  async linkGroup({ parent, child }: { parent: string; child: string }) {
+  async addMembership({ parent, child }: { parent: string; child: string }) {
     await this.pool.query(
       'insert into memberships (parent, child) values ($1, $2)',
+      [parent, child],
+    );
+  }
+
+  async removeMembership({ parent, child }: { parent: string; child: string }) {
+    await this.pool.query(
+      'delete from memberships where parent = $1 and child = $2',
       [parent, child],
     );
   }

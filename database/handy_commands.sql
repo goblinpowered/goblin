@@ -17,6 +17,9 @@
 --   SET count = EXCLUDED.count + transitive_memberships.count
 -- child a11307c4-aeea-4312-907e-dfa0e2e2a932
 -- parent 89c7d153-ba84-42fc-8037-d591423c7af9
+INSERT INTO resources (resource_id, resource_type)
+    VALUES ($1, $2);
+
 WITH RECURSIVE search_graph AS (
     SELECT
         parent,

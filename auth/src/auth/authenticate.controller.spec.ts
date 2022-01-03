@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AddMembershipRequest } from '../proto/authservice';
-import { PostgresService } from '../services/postgres/postgres.service';
-import { AddMembershipController } from './addMembership.controller';
+import { AuthenticateRequest } from '../proto/authservice';
+import { AuthenticateController } from './authenticate.controller';
 import { Pool } from 'pg';
 import {
   createGroup,
@@ -12,8 +11,8 @@ import {
 } from '../testing/postgres';
 import { AuthModule } from './auth.module';
 
-describe('AddMembershipController', () => {
-  let controller: AddMembershipController;
+describe('AuthenticateController', () => {
+  let controller: AuthenticateController;
   let pool: Pool;
 
   beforeEach(async () => {
@@ -21,7 +20,7 @@ describe('AddMembershipController', () => {
       imports: [AuthModule],
     }).compile();
 
-    controller = module.get<AddMembershipController>(AddMembershipController);
+    controller = module.get<AuthenticateController>(AuthenticateController);
     pool = module.get<Pool>('POSTGRES');
   });
 

@@ -6,14 +6,21 @@ export const protobufPackage = "framesystem.auth";
 
 export interface AuthorizeRequest {
   resource: string;
-  profile: string;
+  actor: string;
   role: string;
-  user: string;
-  token: string;
 }
 
 export interface AuthorizeResponse {
   authorized: boolean;
+}
+
+export interface AuthenticateRequest {
+  user: string;
+  token: string;
+}
+
+export interface AuthenticateResponse {
+  authenticated: boolean;
 }
 
 export interface CreateResourceRequest {
@@ -55,30 +62,18 @@ export interface RevokeRoleRequest {
 
 export interface RevokeRoleResponse {}
 
-const baseAuthorizeRequest: object = {
-  resource: "",
-  profile: "",
-  role: "",
-  user: "",
-  token: "",
-};
+const baseAuthorizeRequest: object = { resource: "", actor: "", role: "" };
 
 export const AuthorizeRequest = {
   encode(message: AuthorizeRequest, writer: Writer = Writer.create()): Writer {
     if (message.resource !== "") {
       writer.uint32(10).string(message.resource);
     }
-    if (message.profile !== "") {
-      writer.uint32(18).string(message.profile);
+    if (message.actor !== "") {
+      writer.uint32(18).string(message.actor);
     }
     if (message.role !== "") {
       writer.uint32(26).string(message.role);
-    }
-    if (message.user !== "") {
-      writer.uint32(34).string(message.user);
-    }
-    if (message.token !== "") {
-      writer.uint32(42).string(message.token);
     }
     return writer;
   },
@@ -94,16 +89,10 @@ export const AuthorizeRequest = {
           message.resource = reader.string();
           break;
         case 2:
-          message.profile = reader.string();
+          message.actor = reader.string();
           break;
         case 3:
           message.role = reader.string();
-          break;
-        case 4:
-          message.user = reader.string();
-          break;
-        case 5:
-          message.token = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -119,21 +108,13 @@ export const AuthorizeRequest = {
       object.resource !== undefined && object.resource !== null
         ? String(object.resource)
         : "";
-    message.profile =
-      object.profile !== undefined && object.profile !== null
-        ? String(object.profile)
+    message.actor =
+      object.actor !== undefined && object.actor !== null
+        ? String(object.actor)
         : "";
     message.role =
       object.role !== undefined && object.role !== null
         ? String(object.role)
-        : "";
-    message.user =
-      object.user !== undefined && object.user !== null
-        ? String(object.user)
-        : "";
-    message.token =
-      object.token !== undefined && object.token !== null
-        ? String(object.token)
         : "";
     return message;
   },
@@ -141,10 +122,8 @@ export const AuthorizeRequest = {
   toJSON(message: AuthorizeRequest): unknown {
     const obj: any = {};
     message.resource !== undefined && (obj.resource = message.resource);
-    message.profile !== undefined && (obj.profile = message.profile);
+    message.actor !== undefined && (obj.actor = message.actor);
     message.role !== undefined && (obj.role = message.role);
-    message.user !== undefined && (obj.user = message.user);
-    message.token !== undefined && (obj.token = message.token);
     return obj;
   },
 
@@ -153,10 +132,8 @@ export const AuthorizeRequest = {
   ): AuthorizeRequest {
     const message = { ...baseAuthorizeRequest } as AuthorizeRequest;
     message.resource = object.resource ?? "";
-    message.profile = object.profile ?? "";
+    message.actor = object.actor ?? "";
     message.role = object.role ?? "";
-    message.user = object.user ?? "";
-    message.token = object.token ?? "";
     return message;
   },
 };
@@ -209,6 +186,129 @@ export const AuthorizeResponse = {
   ): AuthorizeResponse {
     const message = { ...baseAuthorizeResponse } as AuthorizeResponse;
     message.authorized = object.authorized ?? false;
+    return message;
+  },
+};
+
+const baseAuthenticateRequest: object = { user: "", token: "" };
+
+export const AuthenticateRequest = {
+  encode(
+    message: AuthenticateRequest,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.user !== "") {
+      writer.uint32(10).string(message.user);
+    }
+    if (message.token !== "") {
+      writer.uint32(18).string(message.token);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): AuthenticateRequest {
+    const reader = input instanceof Reader ? input : new Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseAuthenticateRequest } as AuthenticateRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.user = reader.string();
+          break;
+        case 2:
+          message.token = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AuthenticateRequest {
+    const message = { ...baseAuthenticateRequest } as AuthenticateRequest;
+    message.user =
+      object.user !== undefined && object.user !== null
+        ? String(object.user)
+        : "";
+    message.token =
+      object.token !== undefined && object.token !== null
+        ? String(object.token)
+        : "";
+    return message;
+  },
+
+  toJSON(message: AuthenticateRequest): unknown {
+    const obj: any = {};
+    message.user !== undefined && (obj.user = message.user);
+    message.token !== undefined && (obj.token = message.token);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<AuthenticateRequest>, I>>(
+    object: I
+  ): AuthenticateRequest {
+    const message = { ...baseAuthenticateRequest } as AuthenticateRequest;
+    message.user = object.user ?? "";
+    message.token = object.token ?? "";
+    return message;
+  },
+};
+
+const baseAuthenticateResponse: object = { authenticated: false };
+
+export const AuthenticateResponse = {
+  encode(
+    message: AuthenticateResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.authenticated === true) {
+      writer.uint32(8).bool(message.authenticated);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): AuthenticateResponse {
+    const reader = input instanceof Reader ? input : new Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseAuthenticateResponse } as AuthenticateResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.authenticated = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AuthenticateResponse {
+    const message = { ...baseAuthenticateResponse } as AuthenticateResponse;
+    message.authenticated =
+      object.authenticated !== undefined && object.authenticated !== null
+        ? Boolean(object.authenticated)
+        : false;
+    return message;
+  },
+
+  toJSON(message: AuthenticateResponse): unknown {
+    const obj: any = {};
+    message.authenticated !== undefined &&
+      (obj.authenticated = message.authenticated);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<AuthenticateResponse>, I>>(
+    object: I
+  ): AuthenticateResponse {
+    const message = { ...baseAuthenticateResponse } as AuthenticateResponse;
+    message.authenticated = object.authenticated ?? false;
     return message;
   },
 };
@@ -797,6 +897,7 @@ export const RevokeRoleResponse = {
 
 export interface FramesystemAuthService {
   Authorize(request: AuthorizeRequest): Promise<AuthorizeResponse>;
+  Authenticate(request: AuthenticateRequest): Promise<AuthenticateResponse>;
   CreateResource(
     request: CreateResourceRequest
   ): Promise<CreateResourceResponse>;

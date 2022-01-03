@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { RemoveMembershipRequest } from '../proto/authservice';
-import { PostgresService } from '../services/postgres/postgres.service';
 import { RemoveMembershipController } from './removeMembership.controller';
 import { Pool } from 'pg';
 import {
@@ -10,6 +9,7 @@ import {
   authenticate,
   grant,
 } from '../testing/postgres';
+import { AuthModule } from './auth.module';
 
 describe('RemoveMembershipController', () => {
   let controller: RemoveMembershipController;
@@ -17,14 +17,7 @@ describe('RemoveMembershipController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [RemoveMembershipController],
-      providers: [
-        PostgresService,
-        {
-          provide: 'POSTGRES',
-          useClass: Pool,
-        },
-      ],
+      imports: [AuthModule],
     }).compile();
 
     controller = module.get<RemoveMembershipController>(

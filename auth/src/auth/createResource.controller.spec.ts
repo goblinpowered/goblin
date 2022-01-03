@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CreateResourceRequest } from '../proto/authservice';
-import { PostgresService } from '../services/postgres/postgres.service';
 import { CreateResourceController } from './createResource.controller';
 import { Pool } from 'pg';
 import {
@@ -10,6 +9,7 @@ import {
   authenticate,
   grant,
 } from '../testing/postgres';
+import { AuthModule } from './auth.module';
 
 describe('CreateResourceController', () => {
   let controller: CreateResourceController;
@@ -17,14 +17,7 @@ describe('CreateResourceController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [CreateResourceController],
-      providers: [
-        PostgresService,
-        {
-          provide: 'POSTGRES',
-          useClass: Pool,
-        },
-      ],
+      imports: [AuthModule],
     }).compile();
 
     controller = module.get<CreateResourceController>(CreateResourceController);
