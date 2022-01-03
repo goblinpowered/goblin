@@ -3,6 +3,11 @@ package framesystem.auth;
 
 service FramesystemAuthService {
   rpc Authorize(AuthorizeRequest) returns (AuthorizeResponse) {}
+  rpc CreateResource(CreateResourceRequest) returns (CreateResourceResponse) {}
+  rpc AddMembership(AddMembershipRequest) returns (AddMembershipResponse) {}
+  rpc RemoveMembership(RemoveMembershipRequest) returns (RemoveMembershipResponse) {}
+  rpc GrantRole(GrantRoleRequest) returns (GrantRoleResponse) {}
+  rpc RevokeRole(RevokeRoleRequest) returns (RevokeRoleResponse) {}
 }
 
 message AuthorizeRequest {
@@ -16,3 +21,42 @@ message AuthorizeRequest {
 message AuthorizeResponse {
   bool authorized = 1;
 }
+
+message CreateResourceRequest {
+  string type = 1;
+  string id = 2;
+}
+
+message CreateResourceResponse {
+  string id = 1;
+}
+
+message AddMembershipRequest {
+  string parent = 1;
+  string child = 2;
+}
+
+message AddMembershipResponse {}
+
+message RemoveMembershipRequest {
+  string parent = 1;
+  string child = 2;
+}
+
+message RemoveMembershipResponse {}
+
+message GrantRoleRequest {
+  string resource = 1;
+  string actor = 2;
+  string role = 3;
+}
+
+message GrantRoleResponse {}
+
+message RevokeRoleRequest {
+  string resource = 1;
+  string actor = 2;
+  string role = 3;
+}
+
+message RevokeRoleResponse {}

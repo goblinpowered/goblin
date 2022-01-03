@@ -1,4 +1,4 @@
-import { Controller, Inject } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { AuthorizeRequest, AuthorizeResponse } from '../proto/authservice';
 import { FirebaseService } from '../services/firebase/firebase.service';
