@@ -36,7 +36,9 @@ describe('GrantRoleController', () => {
       [resource, actor],
     );
     expect(b.rowCount).toEqual(0);
-    await controller.execute({ resource, actor, role: 'test_role' });
+    await controller.execute(
+      GrantRoleRequest.fromPartial({ resource, actor, role: 'test_role' }),
+    );
     const a = await pool.query(
       'select * from grants where resource_id = $1 and actor_id = $2',
       [resource, actor],

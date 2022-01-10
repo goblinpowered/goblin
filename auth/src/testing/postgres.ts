@@ -36,25 +36,12 @@ export async function createUser(name: string, pool: Pool) {
   );
 }
 
-export async function createResource({
-  tableName,
-  id,
-  type,
-}: {
-  tableName: string;
-  id: string;
-  type: string;
-}) {
+export async function createResource(type: string, pool: Pool) {
   const qstring = `
-    with allocated_resource as (
       insert into resources (resource_type) values ($1) returning resource_id
-    )
-      insert into ${tableName} (${id}) 
-      select * from allocated_resource 
-      returning ${id}
     `;
-  const result = await this.pool.query(qstring, [type]);
-  return result.rows[0][id];
+  const result = await pool.query(qstring, [type]);
+  return result.rows[0].resource_id;
 }
 
 export async function createActor(

@@ -30,7 +30,55 @@ describe('RemoveMembershipController', () => {
     await pool?.end();
   });
 
-  test('builds', async () => {
-    expect(controller).toBeDefined();
+  test('removes existing memberships', async () => {
+    const g1 = await createGroup('parent', pool);
+    const g2 = await createGroup('child', pool);
+    await pool.query(
+      'insert into memberships (parent, child) values ($1, $2)',
+      [g1, g2],
+    );
+    expect(
+      (
+        await pool.query(
+          'select * from memberships where parent = $1 and child = $2',
+          [g1, g2],
+        )
+      ).rowCount,
+    ).toEqual(1);
+    await controller.execute(
+      RemoveMembershipRequest.fromPartial({ parent: g1, child: g2 }),
+    );
+    expect(
+      (
+        await pool.query(
+          'select * from memberships where parent = $1 and child = $2',
+          [g1, g2],
+        )
+      ).rowCount,
+    ).toEqual(0);
+  });
+
+  test('works with nonexistent memberships', async () => {
+    const g1 = await createGroup('parent', pool);
+    const g2 = await createGroup('child', pool);
+    expect(
+      (
+        await pool.query(
+          'select * from memberships where parent = $1 and child = $2',
+          [g1, g2],
+        )
+      ).rowCount,
+    ).toEqual(0);
+    await controller.execute(
+      RemoveMembershipRequest.fromPartial({ parent: g1, child: g2 }),
+    );
+    expect(
+      (
+        await pool.query(
+          'select * from memberships where parent = $1 and child = $2',
+          [g1, g2],
+        )
+      ).rowCount,
+    ).toEqual(0);
   });
 });

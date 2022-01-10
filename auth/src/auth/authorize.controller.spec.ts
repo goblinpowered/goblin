@@ -11,7 +11,7 @@ import {
 import { Pool } from 'pg';
 import {
   createGroup,
-  createUser,
+  createResource,
   createProfile,
   authenticate,
   grant,
@@ -52,28 +52,34 @@ describe('AuthorizeController', () => {
     await pool?.end();
   });
 
-  test('it authenticates tokens', async () => {
+  test('it checks direct grants', async () => {
     const resource = await createGroup('resource', pool);
     const actor = await createProfile('actor', pool);
-    const user = await createUser('user', pool);
-    const userInfo = await admin.auth().createUser({
-      displayName: 'user',
-      emailVerified: true,
-      password: 'password',
-      email: `${user}@example.com`,
-    });
-
-    const credential = await signInWithEmailAndPassword(
-      auth,
-      `${user}@example.com`,
-      'password',
-    );
-
-    const decodedToken = await credential.user.getIdTokenResult();
-
-    await authenticate({ user, token: userInfo.uid }, pool);
     await grant({ resource, actor, role: 'potato' }, pool);
-    await grant({ resource: actor, actor: user, role: 'actor' }, pool);
+    const result = await controller.authorize(
+      AuthorizeRequest.fromPartial({
+        resource,
+        actor,
+        role: 'potato',
+      }),
+    );
+    expect(result.authorized).toEqual(true);
+  });
+
+  test('it checks indirect grants', async () => {
+    const g1 = await createGroup('parent', pool);
+    const g2 = await createGroup('child', pool);
+    const resource = await createResource('resource', pool);
+    const actor = await createProfile('actor', pool);
+    await grant({ resource, actor: g1, role: 'potato' }, pool);
+    await pool.query(
+      'insert into memberships (parent, child) values ($1, $2)',
+      [g1, g2],
+    );
+    await pool.query(
+      'insert into memberships (parent, child) values ($1, $2)',
+      [g2, actor],
+    );
     const result = await controller.authorize(
       AuthorizeRequest.fromPartial({
         resource,

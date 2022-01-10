@@ -9,6 +9,7 @@ import {
   grant,
 } from '../testing/postgres';
 import { AuthModule } from './auth.module';
+import { RevokeRoleRequest } from 'proto/authservice';
 
 describe('RevokeRoleController', () => {
   let controller: RevokeRoleController;
@@ -27,7 +28,26 @@ describe('RevokeRoleController', () => {
     await pool?.end();
   });
 
-  test('builds', async () => {
-    expect(controller).toBeDefined();
+  test('revokes roles', async () => {
+    const resource = await createProfile('resource', pool);
+    const actor = await createProfile('actor', pool);
+    await pool.query(
+      'insert into grants (resource_id, actor_id, role) values ($1, $2, $3)',
+      [resource, actor, 'test_role'],
+    );
+    const b = await pool.query(
+      'select * from grants where resource_id = $1 and actor_id = $2',
+      [resource, actor],
+    );
+    expect(b.rowCount).toEqual(1);
+    await controller.execute(
+      RevokeRoleRequest.fromPartial({ resource, actor, role: 'test_role' }),
+    );
+    const a = await pool.query(
+      'select * from grants where resource_id = $1 and actor_id = $2',
+      [resource, actor],
+    );
+    expect(a.rowCount).toEqual(0);
+    expect(a.rows[0].role).toEqual('test_role');
   });
 });

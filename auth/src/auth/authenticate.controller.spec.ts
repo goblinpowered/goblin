@@ -10,6 +10,7 @@ import {
   grant,
 } from '../testing/postgres';
 import { AuthModule } from './auth.module';
+import { randomUUID } from 'crypto';
 
 describe('AuthenticateController', () => {
   let controller: AuthenticateController;
@@ -28,7 +29,36 @@ describe('AuthenticateController', () => {
     await pool?.end();
   });
 
-  test('builds', async () => {
-    expect(controller).toBeDefined();
+  test('authenticates positive', async () => {
+    const user = await createUser('user', pool);
+    const token = 'ooooid';
+    await pool.query('insert into authn (user_id, oid) values ($1, $2)', [
+      user,
+      token,
+    ]);
+    const response = await controller.execute(
+      AuthenticateRequest.fromPartial({ user, token }),
+    );
+    expect(response.authenticated).toEqual(true);
+  });
+
+  test('authenticates negative, existing', async () => {
+    const user = await createUser('user', pool);
+    const token = 'ooooid';
+    await pool.query('insert into authn (user_id, oid) values ($1, $2)', [
+      user,
+      token,
+    ]);
+    const response = await controller.execute(
+      AuthenticateRequest.fromPartial({ user, token: 'incorrect' }),
+    );
+    expect(response.authenticated).toEqual(true);
+  });
+
+  test('authenticates negative, not existing', async () => {
+    const response = await controller.execute(
+      AuthenticateRequest.fromPartial({ user: randomUUID(), token: 'stuff' }),
+    );
+    expect(response.authenticated).toEqual(false);
   });
 });
