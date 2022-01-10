@@ -1,7 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { FirebaseService } from '../services/firebase/firebase.service';
 import { AuthorizeRequest } from '../proto/authservice';
-import { PostgresService } from '../services/postgres/postgres.service';
 import { AuthorizeController } from './authorize.controller';
 import * as admin from 'firebase-admin';
 import { initializeApp } from 'firebase/app';
@@ -72,17 +70,14 @@ describe('AuthorizeController', () => {
     );
 
     const decodedToken = await credential.user.getIdTokenResult();
-    const token: string = decodedToken.token;
 
     await authenticate({ user, token: userInfo.uid }, pool);
     await grant({ resource, actor, role: 'potato' }, pool);
     await grant({ resource: actor, actor: user, role: 'actor' }, pool);
     const result = await controller.authorize(
       AuthorizeRequest.fromPartial({
-        token,
         resource,
-        profile: actor,
-        user,
+        actor,
         role: 'potato',
       }),
     );

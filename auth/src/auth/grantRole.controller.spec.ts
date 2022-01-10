@@ -28,7 +28,20 @@ describe('GrantRoleController', () => {
     await pool?.end();
   });
 
-  test('builds', async () => {
-    expect(controller).toBeDefined();
+  test('grants roles', async () => {
+    const resource = await createProfile('resource', pool);
+    const actor = await createProfile('actor', pool);
+    const b = await pool.query(
+      'select * from grants where resource_id = $1 and actor_id = $2',
+      [resource, actor],
+    );
+    expect(b.rowCount).toEqual(0);
+    await controller.execute({ resource, actor, role: 'test_role' });
+    const a = await pool.query(
+      'select * from grants where resource_id = $1 and actor_id = $2',
+      [resource, actor],
+    );
+    expect(a.rowCount).toEqual(1);
+    expect(a.rows[0].role).toEqual('test_role');
   });
 });
