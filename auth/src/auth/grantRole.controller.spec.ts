@@ -44,6 +44,6 @@ describe('GrantRoleController', () => {
       [resource, actor],
     );
     expect(a.rowCount).toEqual(1);
-    expect(a.rows[0].role).toEqual('test_role');
+    expect(a.rows[0].granted_role).toEqual('test_role');
   });
 });

@@ -10,10 +10,10 @@ export class RevokeRoleController {
   @GrpcMethod('FramesystemAuthService', 'RevokeRole')
   async execute(request: RevokeRoleRequest): Promise<RevokeRoleResponse> {
     await this.pool.query(
-      `DELETE FROM roles
+      `DELETE FROM grants
       WHERE resource_id = $1
           AND actor_id = $2
-          AND resource_role = $3`,
+          AND granted_role = $3`,
       [request.resource, request.actor, request.role],
     );
     return RevokeRoleResponse.fromPartial({});

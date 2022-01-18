@@ -10,7 +10,7 @@ export class GrantRoleController {
   @GrpcMethod('FramesystemAuthService', 'GrantRole')
   async execute(request: GrantRoleRequest): Promise<GrantRoleResponse> {
     await this.pool.query(
-      `INSERT INTO roles (resource_id, actor_id, resource_role)
+      `INSERT INTO grants (resource_id, actor_id, granted_role)
           VALUES ($1, $2, $3);`,
       [request.resource, request.actor, request.role],
     );

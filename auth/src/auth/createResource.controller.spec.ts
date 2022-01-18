@@ -25,14 +25,15 @@ describe('CreateResourceController', () => {
   test('creates resource with undefined id', async () => {
     const response = await controller.execute(
       CreateResourceRequest.fromPartial({
-        type: 'test_type',
+        type: 'campaign',
       }),
     );
     expect(response.id).toBeDefined();
-    const res = await pool.query('select * from resources where id = $1', [
-      response.id,
-    ]);
-    expect(res.rows[0].type).toEqual('test_type');
+    const res = await pool.query(
+      'select * from resources where resource_id = $1',
+      [response.id],
+    );
+    expect(res.rows[0].resource_type).toEqual('campaign');
   });
 
   test('creates resource with defined id', async () => {
@@ -40,13 +41,14 @@ describe('CreateResourceController', () => {
     const response = await controller.execute(
       CreateResourceRequest.fromPartial({
         id,
-        type: 'test_type',
+        type: 'campaign',
       }),
     );
     expect(response.id).toEqual(id);
-    const res = await pool.query('select * from resources where id = $1', [
-      response.id,
-    ]);
-    expect(res.rows[0].type).toEqual('test_type');
+    const res = await pool.query(
+      'select * from resources where resource_id = $1',
+      [response.id],
+    );
+    expect(res.rows[0].resource_type).toEqual('campaign');
   });
 });

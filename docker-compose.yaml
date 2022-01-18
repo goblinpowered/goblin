@@ -49,8 +49,8 @@ services:
       - ./auth:/usr/src/app
     ports:
       - 9229:9229
-    # command: npm run test:watch
-    command: node --inspect-brk=0.0.0.0 -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand --watchAll
+    command: npm run test:watch
+    # command: node --inspect-brk=0.0.0.0 -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand --watchAll
     env_file:
       - env/dev.env
   # continuous test run for the api

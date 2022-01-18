@@ -24,6 +24,7 @@ message AuthorizeResponse {
 message AuthenticateRequest {
   string user = 1;
   string token = 2;
+  string idp = 3;
 }
 
 message AuthenticateResponse {

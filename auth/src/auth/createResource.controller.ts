@@ -18,14 +18,14 @@ export class CreateResourceController {
     if (request.id) {
       await this.pool.query(
         `INSERT INTO resources (resource_id, resource_type)
-            VALUES ($1, $2)`,
+            VALUES ($1::uuid, $2)`,
         [request.id, request.type],
       );
       id = request.id;
     } else {
       const result = await this.pool.query(
-        `INSERT INTO resources (resource_id, resource_type) 
-            VALUES ($2) 
+        `INSERT INTO resources (resource_type) 
+            VALUES ($1) 
             RETURNING *`,
         [request.type],
       );

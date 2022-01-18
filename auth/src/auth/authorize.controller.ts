@@ -10,7 +10,7 @@ export class AuthorizeController {
   constructor(@Inject('POSTGRES') private pool: Pool) {}
 
   @GrpcMethod('FramesystemAuthService', 'Authorize')
-  async authorize(request: AuthorizeRequest): Promise<AuthorizeResponse> {
+  async execute(request: AuthorizeRequest): Promise<AuthorizeResponse> {
     const result = await this.pool.query(
       `SELECT
         *

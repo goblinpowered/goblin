@@ -15,6 +15,7 @@ import { randomUUID } from 'crypto';
 describe('AuthenticateController', () => {
   let controller: AuthenticateController;
   let pool: Pool;
+  const idp = 'test_idp';
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -23,6 +24,9 @@ describe('AuthenticateController', () => {
 
     controller = module.get<AuthenticateController>(AuthenticateController);
     pool = module.get<Pool>('POSTGRES');
+    await pool.query(
+      `alter type idp_authorities add value if not exists '${idp}'`,
+    );
   });
 
   afterEach(async () => {
@@ -32,12 +36,12 @@ describe('AuthenticateController', () => {
   test('authenticates positive', async () => {
     const user = await createUser('user', pool);
     const token = 'ooooid';
-    await pool.query('insert into authn (user_id, oid) values ($1, $2)', [
-      user,
-      token,
-    ]);
+    await pool.query(
+      'insert into authn (user_id, oid, idp) values ($1, $2, $3)',
+      [user, token, idp],
+    );
     const response = await controller.execute(
-      AuthenticateRequest.fromPartial({ user, token }),
+      AuthenticateRequest.fromPartial({ user, token, idp }),
     );
     expect(response.authenticated).toEqual(true);
   });
@@ -45,19 +49,23 @@ describe('AuthenticateController', () => {
   test('authenticates negative, existing', async () => {
     const user = await createUser('user', pool);
     const token = 'ooooid';
-    await pool.query('insert into authn (user_id, oid) values ($1, $2)', [
-      user,
-      token,
-    ]);
-    const response = await controller.execute(
-      AuthenticateRequest.fromPartial({ user, token: 'incorrect' }),
+    await pool.query(
+      'insert into authn (user_id, oid, idp) values ($1, $2, $3)',
+      [user, token, idp],
     );
-    expect(response.authenticated).toEqual(true);
+    const response = await controller.execute(
+      AuthenticateRequest.fromPartial({ user, token: 'incorrect', idp }),
+    );
+    expect(response.authenticated).toEqual(false);
   });
 
   test('authenticates negative, not existing', async () => {
     const response = await controller.execute(
-      AuthenticateRequest.fromPartial({ user: randomUUID(), token: 'stuff' }),
+      AuthenticateRequest.fromPartial({
+        user: randomUUID(),
+        token: 'stuff',
+        idp,
+      }),
     );
     expect(response.authenticated).toEqual(false);
   });

@@ -17,6 +17,7 @@ export interface AuthorizeResponse {
 export interface AuthenticateRequest {
   user: string;
   token: string;
+  idp: string;
 }
 
 export interface AuthenticateResponse {
@@ -190,7 +191,7 @@ export const AuthorizeResponse = {
   },
 };
 
-const baseAuthenticateRequest: object = { user: '', token: '' };
+const baseAuthenticateRequest: object = { user: '', token: '', idp: '' };
 
 export const AuthenticateRequest = {
   encode(
@@ -202,6 +203,9 @@ export const AuthenticateRequest = {
     }
     if (message.token !== '') {
       writer.uint32(18).string(message.token);
+    }
+    if (message.idp !== '') {
+      writer.uint32(26).string(message.idp);
     }
     return writer;
   },
@@ -218,6 +222,9 @@ export const AuthenticateRequest = {
           break;
         case 2:
           message.token = reader.string();
+          break;
+        case 3:
+          message.idp = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -237,6 +244,8 @@ export const AuthenticateRequest = {
       object.token !== undefined && object.token !== null
         ? String(object.token)
         : '';
+    message.idp =
+      object.idp !== undefined && object.idp !== null ? String(object.idp) : '';
     return message;
   },
 
@@ -244,6 +253,7 @@ export const AuthenticateRequest = {
     const obj: any = {};
     message.user !== undefined && (obj.user = message.user);
     message.token !== undefined && (obj.token = message.token);
+    message.idp !== undefined && (obj.idp = message.idp);
     return obj;
   },
 
@@ -253,6 +263,7 @@ export const AuthenticateRequest = {
     const message = { ...baseAuthenticateRequest } as AuthenticateRequest;
     message.user = object.user ?? '';
     message.token = object.token ?? '';
+    message.idp = object.idp ?? '';
     return message;
   },
 };

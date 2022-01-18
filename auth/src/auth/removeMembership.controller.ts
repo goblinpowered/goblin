@@ -18,7 +18,7 @@ export class RemoveMembershipController {
       `DELETE FROM memberships
          WHERE parent = $1
          AND child = $2;`,
-      [(request.parent, request.child)],
+      [request.parent, request.child],
     );
     return RemoveMembershipResponse.fromPartial({});
   }

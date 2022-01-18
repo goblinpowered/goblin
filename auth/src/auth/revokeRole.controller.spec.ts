@@ -9,7 +9,7 @@ import {
   grant,
 } from '../testing/postgres';
 import { AuthModule } from './auth.module';
-import { RevokeRoleRequest } from 'proto/authservice';
+import { RevokeRoleRequest } from '../proto/authservice';
 
 describe('RevokeRoleController', () => {
   let controller: RevokeRoleController;
@@ -32,7 +32,7 @@ describe('RevokeRoleController', () => {
     const resource = await createProfile('resource', pool);
     const actor = await createProfile('actor', pool);
     await pool.query(
-      'insert into grants (resource_id, actor_id, role) values ($1, $2, $3)',
+      'insert into grants (resource_id, actor_id, granted_role) values ($1, $2, $3)',
       [resource, actor, 'test_role'],
     );
     const b = await pool.query(
@@ -48,6 +48,5 @@ describe('RevokeRoleController', () => {
       [resource, actor],
     );
     expect(a.rowCount).toEqual(0);
-    expect(a.rows[0].role).toEqual('test_role');
   });
 });

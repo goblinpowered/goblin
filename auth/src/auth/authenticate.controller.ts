@@ -19,8 +19,9 @@ export class AuthenticateController {
         authn
       WHERE
         user_id = $1
-        AND oid = $2`,
-      [request.user, request.token],
+        AND oid = $2
+        AND idp = $3`,
+      [request.user, request.token, request.idp],
     );
     return AuthenticateResponse.fromPartial({
       authenticated: result.rowCount > 0,
